@@ -6,13 +6,18 @@ import json
 import os
 import re
 import time
+import hashlib
+import html
 from pathlib import Path
-from typing import Any, Dict, List
-from urllib.parse import unquote
+from typing import Any, Dict, List, Tuple
+from urllib.parse import unquote, urljoin, urlparse
 
+import aiofiles
+import aiohttp
 import requests
 from playwright.async_api import async_playwright
 from bs4 import BeautifulSoup
+from markdownify import markdownify as md
 
 
 class LvyaTechScraper:
@@ -41,7 +46,10 @@ class LvyaTechScraper:
         self.browser = None
         self.context = None
         self.processed_pages = set()
-        self.save_format = "mhtml"  # 可选: "html" 或 "mhtml"
+        self.save_format = "mhtml"  # 可选: "html", "mhtml" 或 "markdown"
+        self.images_dir = self.output_dir / "images"
+        self.downloaded_images = {}  # URL -> local filename mapping
+        self.session = None
 
     def sanitize_filename(self, filename: str) -> str:
         """清理文件名，移除不合法的字符"""
@@ -105,9 +113,17 @@ class LvyaTechScraper:
                 'path': '/'
             })
         await self.context.add_cookies(cookies)
+        
+        # 初始化aiohttp session
+        self.session = aiohttp.ClientSession(
+            headers=self.headers,
+            cookies=self.cookies
+        )
 
     async def close_browser(self):
         """关闭浏览器"""
+        if self.session:
+            await self.session.close()
         if self.context:
             await self.context.close()
         if self.browser:
@@ -224,7 +240,10 @@ class LvyaTechScraper:
                 
                 await page.wait_for_timeout(500)
             
-            # 根据格式获取内容
+            # 获取渲染后的HTML内容
+            html_content = await page.content()
+            
+            # 根据格式返回内容
             if self.save_format == "mhtml":
                 # 使用CDP获取MHTML
                 client = await page.context.new_cdp_session(page)
@@ -234,9 +253,6 @@ class LvyaTechScraper:
                 # 返回空HTML和MHTML数据
                 return "", mhtml_content.encode('utf-8')
             else:
-                # 获取渲染后的HTML
-                html_content = await page.content()
-                
                 # 处理相对链接，转换为绝对链接
                 soup = BeautifulSoup(html_content, 'lxml')
                 
@@ -261,15 +277,158 @@ class LvyaTechScraper:
             return error_html, b""
         finally:
             await page.close()
+    
+    async def download_image(self, img_url: str) -> str:
+        """下载图片并返回本地路径"""
+        try:
+            # 解码HTML实体（如 &amp; -> &）
+            img_url = html.unescape(img_url)
+            
+            # 如果已经下载过，直接返回
+            if img_url in self.downloaded_images:
+                return self.downloaded_images[img_url]
+            
+            # 下载图片（允许重定向）
+            async with self.session.get(img_url, ssl=False, allow_redirects=True) as response:
+                if response.status == 200:
+                    content = await response.read()
+                    
+                    # 尝试从多个来源获取文件名
+                    filename = None
+                    
+                    # 1. 从Content-Disposition头获取文件名
+                    content_disposition = response.headers.get('Content-Disposition', '')
+                    if content_disposition:
+                        import re
+                        match = re.search(r'filename[^;=\n]*=(([\'"]).*?\2|[^;\n]*)', content_disposition)
+                        if match:
+                            filename = match.group(1).strip('"\'')
+                    
+                    # 2. 从最终URL（重定向后）获取文件名
+                    if not filename:
+                        final_url = str(response.url)
+                        # 如果发生了重定向，显示信息
+                        if final_url != img_url:
+                            print(f"      Redirected to: {final_url}")
+                        parsed_final_url = urlparse(final_url)
+                        filename = os.path.basename(parsed_final_url.path)
+                    
+                    # 3. 从原始URL获取文件名（如果没有重定向）
+                    if not filename or filename in ['index.php', 'download.php', 'file.php']:
+                        parsed_url = urlparse(img_url)
+                        filename = os.path.basename(parsed_url.path)
+                    
+                    # 4. 如果还是没有合适的文件名，使用默认名称
+                    if not filename or filename in ['index.php', 'download.php', 'file.php', '']:
+                        # 尝试从Content-Type获取扩展名
+                        content_type = response.headers.get('Content-Type', '')
+                        ext = '.png'  # 默认扩展名
+                        if 'jpeg' in content_type or 'jpg' in content_type:
+                            ext = '.jpg'
+                        elif 'png' in content_type:
+                            ext = '.png'
+                        elif 'gif' in content_type:
+                            ext = '.gif'
+                        elif 'webp' in content_type:
+                            ext = '.webp'
+                        elif 'svg' in content_type:
+                            ext = '.svg'
+                        
+                        filename = f"image{ext}"
+                    
+                    # 确保文件名有扩展名
+                    if '.' not in filename:
+                        # 从Content-Type获取扩展名
+                        content_type = response.headers.get('Content-Type', '')
+                        if 'jpeg' in content_type or 'jpg' in content_type:
+                            filename += '.jpg'
+                        elif 'png' in content_type:
+                            filename += '.png'
+                        elif 'gif' in content_type:
+                            filename += '.gif'
+                        elif 'webp' in content_type:
+                            filename += '.webp'
+                        else:
+                            filename += '.png'  # 默认
+                    
+                    # 生成唯一的文件名（使用URL哈希作为前缀）
+                    url_hash = hashlib.md5(img_url.encode()).hexdigest()[:8]
+                    local_filename = f"{url_hash}_{filename}"
+                    local_path = self.images_dir / local_filename
+                    
+                    # 保存文件
+                    async with aiofiles.open(local_path, 'wb') as f:
+                        await f.write(content)
+                    
+                    # 记录映射关系
+                    self.downloaded_images[img_url] = f"images/{local_filename}"
+                    print(f"    Downloaded image: {local_filename}")
+                    return f"images/{local_filename}"
+                else:
+                    print(f"    Failed to download image: {img_url} (Status: {response.status})")
+                    return img_url
+                    
+        except Exception as e:
+            print(f"    Error downloading image {img_url}: {e}")
+            return img_url
+    
+    async def convert_to_markdown(self, html_content: str, page_url: str) -> str:
+        """将HTML转换为Markdown并处理图片"""
+        soup = BeautifulSoup(html_content, 'lxml')
+        
+        # 下载并替换所有图片链接
+        for img in soup.find_all('img'):
+            if img.get('src'):
+                img_url = img['src']
+                # 转换为绝对URL
+                if not img_url.startswith(('http://', 'https://')):
+                    img_url = urljoin(page_url, img_url)
+                
+                print(f"    Processing image: {img_url}")
+                
+                # 下载图片
+                local_path = await self.download_image(img_url)
+                img['src'] = local_path
+        
+        # 转换为Markdown
+        markdown_content = md(str(soup), heading_style="ATX", bullets="-")
+        
+        # 清理多余的空行
+        markdown_content = re.sub(r'\n{3,}', '\n\n', markdown_content)
+        
+        return markdown_content
 
-    async def save_page_content(self, page_info: Dict[str, Any], content: tuple[str, bytes], file_path: Path):
-        """保存页面内容（HTML或MHTML）"""
+    async def save_page_content(self, page_info: Dict[str, Any], content: tuple[str, bytes], file_path: Path, page_url: str = None):
+        """保存页面内容（HTML、MHTML或Markdown）"""
         try:
             if self.save_format == "mhtml" and content[1]:
                 # 保存MHTML文件
                 with open(file_path, 'wb') as f:
                     f.write(content[1])
                 print(f"  Saved MHTML: {file_path}")
+            elif self.save_format == "markdown":
+                # 转换并保存为Markdown
+                html_content = content[0]
+                markdown_content = await self.convert_to_markdown(html_content, page_url)
+                
+                # 添加页面元数据到Markdown开头
+                page_title = page_info.get('page_title', 'Untitled')
+                metadata = f"""# {page_title}
+
+---
+- **页面ID**: {page_info.get('page_id', '')}
+- **作者ID**: {page_info.get('author_uid', '')}
+- **创建时间**: {page_info.get('addtime', '')}
+- **分类ID**: {page_info.get('cat_id', '')}
+---
+
+"""
+                
+                # 保存Markdown文件
+                async with aiofiles.open(file_path, 'w', encoding='utf-8') as f:
+                    await f.write(metadata + markdown_content)
+                
+                print(f"  Saved Markdown: {file_path}")
             else:
                 # 保存HTML文件
                 html_content = content[0]
@@ -324,11 +483,20 @@ class LvyaTechScraper:
         content = await self.get_page_content(current_item_id, page_id)
         
         # 根据格式确定文件扩展名
-        file_ext = ".mhtml" if self.save_format == "mhtml" else ".html"
+        if self.save_format == "mhtml":
+            file_ext = ".mhtml"
+        elif self.save_format == "markdown":
+            file_ext = ".md"
+        else:
+            file_ext = ".html"
+            
         file_name = f"{page_id}_{page_title_clean}{file_ext}"
         file_path = parent_path / file_name
         
-        await self.save_page_content(page_info, content, file_path)
+        # 构建页面URL
+        page_url = f"{self.web_url}/{current_item_id}/{page_id}"
+        
+        await self.save_page_content(page_info, content, file_path, page_url)
         
         # 延迟避免请求过快
         await asyncio.sleep(1)
@@ -373,7 +541,12 @@ class LvyaTechScraper:
             # 添加到索引
             page_title = page.get('page_title', 'Untitled')
             page_id = page.get('page_id')
-            file_ext = ".mhtml" if self.save_format == "mhtml" else ".html"
+            if self.save_format == "mhtml":
+                file_ext = ".mhtml"
+            elif self.save_format == "markdown":
+                file_ext = ".md"
+            else:
+                file_ext = ".html"
             file_name = f"{page_id}_{self.sanitize_filename(page_title)}{file_ext}"
             index_content += f'        <li><a href="{file_name}">{page_title}</a></li>\n'
         
@@ -418,6 +591,10 @@ class LvyaTechScraper:
             # 创建输出目录
             self.output_dir.mkdir(parents=True, exist_ok=True)
             
+            # 如果是Markdown格式，创建images目录
+            if self.save_format == "markdown":
+                self.images_dir.mkdir(parents=True, exist_ok=True)
+            
             # 保存网站元数据
             with open(self.output_dir / 'site_structure.json', 'w', encoding='utf-8') as f:
                 json.dump(site_data, f, ensure_ascii=False, indent=2)
@@ -458,7 +635,12 @@ class LvyaTechScraper:
                 # 添加到主索引
                 page_title = page.get('page_title', 'Untitled')
                 page_id = page.get('page_id')
-                file_ext = ".mhtml" if self.save_format == "mhtml" else ".html"
+                if self.save_format == "mhtml":
+                    file_ext = ".mhtml"
+                elif self.save_format == "markdown":
+                    file_ext = ".md"
+                else:
+                    file_ext = ".html"
                 file_name = f"{page_id}_{self.sanitize_filename(page_title)}{file_ext}"
                 index_content += f'            <li><a href="{file_name}">{page_title}</a></li>\n'
             
@@ -511,6 +693,10 @@ async def main():
     if '--html' in sys.argv:
         save_format = "html"
         print("Using HTML format (without embedded resources)")
+    
+    if '--markdown' in sys.argv or '--md' in sys.argv:
+        save_format = "markdown"
+        print("Using Markdown format (with local images)")
     
     scraper = LvyaTechScraper()
     await scraper.scrape_site(headless=headless, save_format=save_format)
