@@ -41,6 +41,7 @@ class LvyaTechScraper:
         self.browser = None
         self.context = None
         self.processed_pages = set()
+        self.save_format = "mhtml"  # 可选: "html" 或 "mhtml"
 
     def sanitize_filename(self, filename: str) -> str:
         """清理文件名，移除不合法的字符"""
@@ -114,8 +115,8 @@ class LvyaTechScraper:
         if self.playwright:
             await self.playwright.stop()
 
-    async def get_page_html(self, item_id: str, page_id: str) -> str:
-        """获取动态渲染后的页面HTML"""
+    async def get_page_content(self, item_id: str, page_id: str) -> tuple[str, bytes]:
+        """获取动态渲染后的页面内容（HTML或MHTML）"""
         # 构建正确的URL格式: http://www.lvyatech.com:37788/web/#/{item_id}/{page_id}
         url = f"{self.web_url}/{item_id}/{page_id}"
         print(f"  Loading page: {url}")
@@ -223,61 +224,81 @@ class LvyaTechScraper:
                 
                 await page.wait_for_timeout(500)
             
-            # 获取渲染后的HTML
-            html_content = await page.content()
-            
-            # 处理相对链接，转换为绝对链接
-            soup = BeautifulSoup(html_content, 'lxml')
-            
-            # 转换所有相对链接
-            for tag in soup.find_all(['a', 'link']):
-                if tag.get('href'):
-                    href = tag['href']
-                    if href.startswith('/') and not href.startswith('//'):
-                        tag['href'] = self.base_url + href
-            
-            for tag in soup.find_all(['img', 'script']):
-                if tag.get('src'):
-                    src = tag['src']
-                    if src.startswith('/') and not src.startswith('//'):
-                        tag['src'] = self.base_url + src
-            
-            return str(soup)
+            # 根据格式获取内容
+            if self.save_format == "mhtml":
+                # 使用CDP获取MHTML
+                client = await page.context.new_cdp_session(page)
+                mhtml_data = await client.send('Page.captureSnapshot', {'format': 'mhtml'})
+                mhtml_content = mhtml_data.get('data', '')
+                
+                # 返回空HTML和MHTML数据
+                return "", mhtml_content.encode('utf-8')
+            else:
+                # 获取渲染后的HTML
+                html_content = await page.content()
+                
+                # 处理相对链接，转换为绝对链接
+                soup = BeautifulSoup(html_content, 'lxml')
+                
+                # 转换所有相对链接
+                for tag in soup.find_all(['a', 'link']):
+                    if tag.get('href'):
+                        href = tag['href']
+                        if href.startswith('/') and not href.startswith('//'):
+                            tag['href'] = self.base_url + href
+                
+                for tag in soup.find_all(['img', 'script']):
+                    if tag.get('src'):
+                        src = tag['src']
+                        if src.startswith('/') and not src.startswith('//'):
+                            tag['src'] = self.base_url + src
+                
+                return str(soup), b""
             
         except Exception as e:
             print(f"  Error loading page {url}: {e}")
-            return f"<html><body><h1>Error loading page</h1><p>{str(e)}</p></body></html>"
+            error_html = f"<html><body><h1>Error loading page</h1><p>{str(e)}</p></body></html>"
+            return error_html, b""
         finally:
             await page.close()
 
-    async def save_page_html(self, page_info: Dict[str, Any], html_content: str, file_path: Path):
-        """保存页面HTML内容"""
+    async def save_page_content(self, page_info: Dict[str, Any], content: tuple[str, bytes], file_path: Path):
+        """保存页面内容（HTML或MHTML）"""
         try:
-            # 在HTML中嵌入页面元数据
-            soup = BeautifulSoup(html_content, 'lxml')
-            
-            # 添加元数据到head
-            if not soup.head:
-                soup.html.insert(0, soup.new_tag('head'))
-            
-            # 添加页面信息作为meta标签
-            meta_info = {
-                'page-id': page_info.get('page_id', ''),
-                'page-title': page_info.get('page_title', ''),
-                'author-uid': page_info.get('author_uid', ''),
-                'add-time': page_info.get('addtime', ''),
-                'cat-id': page_info.get('cat_id', '')
-            }
-            
-            for name, content in meta_info.items():
-                meta_tag = soup.new_tag('meta', attrs={'name': name, 'content': str(content)})
-                soup.head.append(meta_tag)
-            
-            # 保存HTML文件
-            with open(file_path, 'w', encoding='utf-8') as f:
-                f.write(str(soup))
-            
-            print(f"  Saved: {file_path}")
+            if self.save_format == "mhtml" and content[1]:
+                # 保存MHTML文件
+                with open(file_path, 'wb') as f:
+                    f.write(content[1])
+                print(f"  Saved MHTML: {file_path}")
+            else:
+                # 保存HTML文件
+                html_content = content[0]
+                
+                # 在HTML中嵌入页面元数据
+                soup = BeautifulSoup(html_content, 'lxml')
+                
+                # 添加元数据到head
+                if not soup.head:
+                    soup.html.insert(0, soup.new_tag('head'))
+                
+                # 添加页面信息作为meta标签
+                meta_info = {
+                    'page-id': page_info.get('page_id', ''),
+                    'page-title': page_info.get('page_title', ''),
+                    'author-uid': page_info.get('author_uid', ''),
+                    'add-time': page_info.get('addtime', ''),
+                    'cat-id': page_info.get('cat_id', '')
+                }
+                
+                for name, content_value in meta_info.items():
+                    meta_tag = soup.new_tag('meta', attrs={'name': name, 'content': str(content_value)})
+                    soup.head.append(meta_tag)
+                
+                # 保存HTML文件
+                with open(file_path, 'w', encoding='utf-8') as f:
+                    f.write(str(soup))
+                
+                print(f"  Saved HTML: {file_path}")
             
         except Exception as e:
             print(f"  Error saving {file_path}: {e}")
@@ -299,14 +320,15 @@ class LvyaTechScraper:
         
         print(f"Processing page: {page_title} (Item: {current_item_id}, Page: {page_id})")
         
-        # 获取页面HTML内容
-        html_content = await self.get_page_html(current_item_id, page_id)
+        # 获取页面内容
+        content = await self.get_page_content(current_item_id, page_id)
         
-        # 保存HTML文件
-        file_name = f"{page_id}_{page_title_clean}.html"
+        # 根据格式确定文件扩展名
+        file_ext = ".mhtml" if self.save_format == "mhtml" else ".html"
+        file_name = f"{page_id}_{page_title_clean}{file_ext}"
         file_path = parent_path / file_name
         
-        await self.save_page_html(page_info, html_content, file_path)
+        await self.save_page_content(page_info, content, file_path)
         
         # 延迟避免请求过快
         await asyncio.sleep(1)
@@ -351,7 +373,8 @@ class LvyaTechScraper:
             # 添加到索引
             page_title = page.get('page_title', 'Untitled')
             page_id = page.get('page_id')
-            file_name = f"{page_id}_{self.sanitize_filename(page_title)}.html"
+            file_ext = ".mhtml" if self.save_format == "mhtml" else ".html"
+            file_name = f"{page_id}_{self.sanitize_filename(page_title)}{file_ext}"
             index_content += f'        <li><a href="{file_name}">{page_title}</a></li>\n'
         
         # 递归处理子目录
@@ -374,10 +397,12 @@ class LvyaTechScraper:
         with open(cat_path / "index.html", 'w', encoding='utf-8') as f:
             f.write(index_content)
 
-    async def scrape_site(self, headless=True):
+    async def scrape_site(self, headless=True, save_format="mhtml"):
         """爬取整个网站"""
+        self.save_format = save_format
         print(f"Starting to scrape site with item_id: {self.item_id}")
         print(f"Browser mode: {'Headless' if headless else 'Visible'}")
+        print(f"Save format: {self.save_format}")
         
         # 初始化浏览器
         await self.init_browser(headless=headless)
@@ -433,7 +458,8 @@ class LvyaTechScraper:
                 # 添加到主索引
                 page_title = page.get('page_title', 'Untitled')
                 page_id = page.get('page_id')
-                file_name = f"{page_id}_{self.sanitize_filename(page_title)}.html"
+                file_ext = ".mhtml" if self.save_format == "mhtml" else ".html"
+                file_name = f"{page_id}_{self.sanitize_filename(page_title)}{file_ext}"
                 index_content += f'            <li><a href="{file_name}">{page_title}</a></li>\n'
             
             # 处理目录结构
@@ -476,12 +502,18 @@ async def main():
     
     # 检查命令行参数
     headless = True
+    save_format = "mhtml"  # 默认使用MHTML格式
+    
     if '--show-browser' in sys.argv:
         headless = False
         print("Running with visible browser for debugging...")
     
+    if '--html' in sys.argv:
+        save_format = "html"
+        print("Using HTML format (without embedded resources)")
+    
     scraper = LvyaTechScraper()
-    await scraper.scrape_site(headless=headless)
+    await scraper.scrape_site(headless=headless, save_format=save_format)
 
 
 if __name__ == "__main__":
