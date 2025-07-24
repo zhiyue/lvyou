@@ -14,12 +14,14 @@
 
 - **MHTML（默认）**：保存完整的页面，包括 HTML、CSS、JavaScript、图片等所有资源，离线查看效果与在线一致
 - **HTML**：仅保存处理后的 HTML 内容，体积小但可能缺少样式和交互功能
-- **Markdown**：转换为 Markdown 格式，下载所有图片到本地，适合文档阅读和编辑
+- **Markdown**：直接通过 API 获取原始 Markdown 内容，速度快，无需浏览器渲染，自动下载图片到本地
 
 ## API 调用说明
 
-- API 端点：`http://www.lvyatech.com:37788/server/index.php?s=/api/item/info`
-- 固定参数：`item_id=39&keyword=&default_page_id=539`
+- 网站结构 API：`http://www.lvyatech.com:37788/server/index.php?s=/api/item/info`
+  - 固定参数：`item_id=39&keyword=&default_page_id=539`
+- 页面内容 API（Markdown 格式专用）：`http://www.lvyatech.com:37788/server/index.php?s=/api/page/info`
+  - 参数：`page_id={页面ID}`
 - 页面 URL 格式：`http://www.lvyatech.com:37788/web/#/{item_id}/{page_id}`
 
 ## 安装依赖
@@ -108,10 +110,13 @@ MHTML 文件可以直接在 Chrome、Edge 等现代浏览器中打开，保留�
 
 1. **格式选择建议**
    - **MHTML**（默认）：需要完整保留页面样式和交互功能时使用
-   - **Markdown**：需要编辑文档内容或在 Markdown 编辑器中查看时使用
+   - **Markdown**：需要编辑文档内容或在 Markdown 编辑器中查看时使用（推荐）
    - **HTML**：只需要基本内容，不需要样式和资源时使用
 
 2. **Markdown 格式特点**
+   - **速度快**：直接通过 API 获取原始 Markdown 内容，无需浏览器渲染
+   - **无需 Playwright**：不启动浏览器，节省资源
+   - **内容纯净**：获取的是原始文档内容，没有导航菜单等干扰
    - 自动下载所有图片到本地 `images/` 目录
    - 图片链接自动修正为相对路径
    - 适合在 Obsidian、Typora 等 Markdown 编辑器中查看

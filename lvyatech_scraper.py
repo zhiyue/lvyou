@@ -24,6 +24,7 @@ class LvyaTechScraper:
     def __init__(self):
         self.base_url = "http://www.lvyatech.com:37788"
         self.api_url = f"{self.base_url}/server/index.php?s=/api/item/info"
+        self.page_api_url = f"{self.base_url}/server/index.php?s=/api/page/info"
         self.web_url = f"{self.base_url}/web/#"
         self.headers = {
             'Accept': 'application/json, text/plain, */*',
@@ -90,6 +91,44 @@ class LvyaTechScraper:
         except Exception as e:
             print(f"Exception getting API data for page {page_id}: {e}")
             return {}
+    
+    def get_page_markdown(self, page_id: str, max_retries: int = 3) -> Dict[str, Any]:
+        """通过API直接获取页面的Markdown内容，支持重试"""
+        data = {
+            'page_id': page_id
+        }
+        
+        for attempt in range(max_retries):
+            try:
+                response = requests.post(
+                    self.page_api_url,
+                    headers=self.headers,
+                    cookies=self.cookies,
+                    data=data,
+                    verify=False,
+                    timeout=30  # 添加超时设置
+                )
+                response.raise_for_status()
+                result = response.json()
+                
+                if result.get('error_code') == 0:
+                    return result.get('data', {})
+                else:
+                    print(f"Error getting markdown for page {page_id}: {result}")
+                    return {}
+                    
+            except requests.exceptions.Timeout:
+                print(f"  Timeout getting markdown for page {page_id} (attempt {attempt + 1}/{max_retries})")
+                if attempt < max_retries - 1:
+                    time.sleep(2 ** attempt)  # 指数退避
+                    continue
+            except Exception as e:
+                print(f"  Exception getting markdown for page {page_id}: {e}")
+                if attempt < max_retries - 1:
+                    time.sleep(2 ** attempt)  # 指数退避
+                    continue
+                    
+        return {}
 
     async def init_browser(self, headless=True):
         """初始化浏览器"""
@@ -376,6 +415,60 @@ class LvyaTechScraper:
         """将HTML转换为Markdown并处理图片"""
         soup = BeautifulSoup(html_content, 'lxml')
         
+        # 清理不需要的导航元素
+        # 删除常见的导航、侧边栏、菜单等元素
+        selectors_to_remove = [
+            # 导航相关
+            'nav', '.nav', '.navigation', '.navbar', '#nav', '#navigation',
+            '.nav-menu', '.menu', '.main-menu', '.side-menu', '.sidebar',
+            '.left-menu', '.right-menu', '.top-menu', '.bottom-menu',
+            
+            # 侧边栏
+            '.sidebar', '.side-bar', '.left-sidebar', '.right-sidebar',
+            '#sidebar', 'aside', '.aside',
+            
+            # 页眉页脚
+            'header', '.header', '#header', '.page-header', '.site-header',
+            'footer', '.footer', '#footer', '.page-footer', '.site-footer',
+            
+            # 面包屑导航
+            '.breadcrumb', '.breadcrumbs', 'nav[aria-label="breadcrumb"]',
+            
+            # 目录/索引
+            '.toc', '.table-of-contents', '#toc', '.catalog', '.catalogue',
+            
+            # 其他常见的非内容元素
+            '.ads', '.advertisement', '.banner', '.popup',
+            '.modal', '.dialog', '.tooltip',
+            
+            # 特定于该网站的选择器（根据实际HTML结构调整）
+            '.left-bar', '.right-bar', '.doc-left-nav', '.doc-menu',
+            '[class*="menu-"]', '[class*="nav-"]', '[id*="menu-"]', '[id*="nav-"]'
+        ]
+        
+        for selector in selectors_to_remove:
+            for element in soup.select(selector):
+                element.decompose()
+        
+        # 查找主要内容区域（通常包含文章主体）
+        main_content = None
+        content_selectors = [
+            'main', 'article', '.content', '.main-content', '#content',
+            '.page-content', '.article-content', '.doc-content', '.markdown-body',
+            '[role="main"]', '.container > div', '.wrapper > div'
+        ]
+        
+        for selector in content_selectors:
+            elements = soup.select(selector)
+            if elements:
+                # 选择包含最多文本的元素作为主内容
+                main_content = max(elements, key=lambda x: len(x.get_text(strip=True)))
+                break
+        
+        # 如果找到主内容区域，只保留该区域
+        if main_content:
+            soup = BeautifulSoup(str(main_content), 'lxml')
+        
         # 下载并替换所有图片链接
         for img in soup.find_all('img'):
             if img.get('src'):
@@ -393,8 +486,127 @@ class LvyaTechScraper:
         # 转换为Markdown
         markdown_content = md(str(soup), heading_style="ATX", bullets="-")
         
-        # 清理多余的空行
+        # 清理转换后的Markdown
+        # 1. 识别并删除导航菜单内容
+        lines = markdown_content.split('\n')
+        
+        # 查找导航区块的模式
+        # 通常导航菜单有以下特征：
+        # - 以"首页"链接开始
+        # - 包含一系列短链接或短文本
+        # - 在真正的页面内容之前
+        
+        # 寻找导航区块
+        nav_start = -1
+        nav_end = -1
+        found_nav_start = False
+        consecutive_short_lines = 0
+        
+        for i, line in enumerate(lines):
+            line_text = line.strip()
+            
+            # 跳过页面标题和元数据部分（通常在前10行内）
+            if i < 10 and ('---' in line_text or '**页面ID**' in line_text or 
+                          '**作者ID**' in line_text or '**创建时间**' in line_text or 
+                          '**分类ID**' in line_text or line_text.startswith('#')):
+                continue
+            
+            # 检查是否包含"首页"（导航的开始标志）
+            if ('首页' in line_text or '[首页]' in line_text):
+                found_nav_start = True
+                if nav_start == -1:
+                    nav_start = i
+                nav_end = i
+            
+            # 如果找到了导航开始
+            if found_nav_start:
+                # 空行不计入
+                if not line_text:
+                    # 如果遇到空行后面跟着长内容，可能是正文开始
+                    if i + 1 < len(lines):
+                        next_line = lines[i + 1].strip()
+                        if len(next_line) > 50:  # 长内容通常是正文
+                            nav_end = i
+                            break
+                    continue
+                
+                # 检查是否是短行（导航项通常很短）
+                # 去除链接标记后的纯文本
+                pure_text = re.sub(r'\[([^\]]+)\]\([^\)]+\)', r'\1', line_text)
+                
+                if len(pure_text) < 30:  # 导航项通常少于30个字符
+                    consecutive_short_lines += 1
+                    nav_end = i + 1
+                else:
+                    # 遇到长内容，可能是正文开始
+                    if consecutive_short_lines > 3:  # 如果已经有连续的短行，认为找到了导航区块
+                        nav_end = i
+                        break
+                    else:
+                        # 如果没有足够的短行，可能不是导航区块
+                        if consecutive_short_lines < 3:
+                            found_nav_start = False
+                            nav_start = -1
+                            nav_end = -1
+                            consecutive_short_lines = 0
+        
+        # 如果找到了导航区块，删除它
+        if found_nav_start and nav_start >= 0 and nav_end > nav_start:
+            # 保留导航前的内容和导航后的内容
+            lines = lines[:nav_start] + lines[nav_end:]
+        
+        # 2. 额外清理：删除页面中间可能出现的导航菜单
+        # 定义导航关键词
+        nav_keywords = {
+            '首页', '《绿邮® X系列开发板》使用指南', '简介', '版本变更',
+            '硬件安装', '快速入门', '接入第三方平台', '设备管理后台',
+            '开发实践指南', '控制命令', '推送消息', '短信指令', '常见问题'
+        }
+        
+        filtered_lines = []
+        skip_count = 0
+        
+        for i, line in enumerate(lines):
+            line_text = line.strip()
+            
+            # 如果需要跳过行
+            if skip_count > 0:
+                skip_count -= 1
+                continue
+            
+            # 提取纯文本（去除Markdown语法）
+            pure_text = re.sub(r'\[([^\]]+)\]\([^\)]+\)', r'\1', line_text)
+            pure_text = re.sub(r'[#*`_~]', '', pure_text).strip()
+            
+            # 检查是否是导航菜单的开始
+            if pure_text in nav_keywords:
+                # 向前查看，计算连续的导航项数量
+                nav_count = 1
+                for j in range(i + 1, min(i + 20, len(lines))):
+                    next_line = lines[j].strip()
+                    next_pure = re.sub(r'\[([^\]]+)\]\([^\)]+\)', r'\1', next_line)
+                    next_pure = re.sub(r'[#*`_~]', '', next_pure).strip()
+                    
+                    if next_pure in nav_keywords or len(next_pure) < 20:
+                        nav_count += 1
+                    else:
+                        break
+                
+                # 如果连续导航项超过3个，跳过整个区块
+                if nav_count >= 3:
+                    skip_count = nav_count - 1
+                    continue
+            
+            # 保留非导航内容
+            filtered_lines.append(line)
+        
+        markdown_content = '\n'.join(filtered_lines)
+        
+        # 3. 清理多余的空行
         markdown_content = re.sub(r'\n{3,}', '\n\n', markdown_content)
+        
+        # 4. 删除开头和结尾的空白
+        markdown_content = markdown_content.strip()
         
         return markdown_content
 
@@ -407,9 +619,54 @@ class LvyaTechScraper:
                     f.write(content[1])
                 print(f"  Saved MHTML: {file_path}")
             elif self.save_format == "markdown":
-                # 转换并保存为Markdown
-                html_content = content[0]
-                markdown_content = await self.convert_to_markdown(html_content, page_url)
+                markdown_content = content[0]
+                
+                # 检查是否是从API获取的原始Markdown
+                if 'page_content' in page_info and content[0] == page_info.get('page_content'):
+                    # 这是从API获取的原始Markdown，需要处理
+                    # 1. 解码HTML实体（如 &quot; -> ", &amp; -> &, 等）
+                    markdown_content = html.unescape(markdown_content)
+                    
+                    # 2. 处理图片链接
+                    # 查找所有图片链接并下载
+                    import re
+                    img_pattern = r'!\[([^\]]*)\]\(([^\)]+)\)'
+                    
+                    async def replace_image(match):
+                        alt_text = match.group(1)
+                        img_url = match.group(2)
+                        
+                        # 处理相对URL
+                        if not img_url.startswith(('http://', 'https://')):
+                            img_url = urljoin(self.base_url, img_url)
+                        
+                        print(f"    Processing image: {img_url}")
+                        local_path = await self.download_image(img_url)
+                        return f'![{alt_text}]({local_path})'
+                    
+                    # 替换所有图片链接
+                    for match in re.finditer(img_pattern, markdown_content):
+                        img_url = match.group(2)
+                        alt_text = match.group(1)
+                        
+                        # 处理相对URL
+                        if not img_url.startswith(('http://', 'https://')):
+                            img_url = urljoin(self.base_url, img_url)
+                        
+                        print(f"    Processing image: {img_url}")
+                        local_path = await self.download_image(img_url)
+                        markdown_content = markdown_content.replace(match.group(0), f'![{alt_text}]({local_path})')
+                    
+                    # 3. 清理HTML标签（如 <center> 等）
+                    markdown_content = re.sub(r'</?center\s*>', '', markdown_content)
+                    # 注意：HTML实体已经被解码，所以不需要处理 &lt; 和 &gt;
+                    
+                    # 4. 清理多余的空白字符
+                    markdown_content = markdown_content.strip()
+                    
+                else:
+                    # 这是从HTML转换来的Markdown，已经处理过了
+                    markdown_content = await self.convert_to_markdown(content[0], page_url)
                 
                 # 添加页面元数据到Markdown开头
                 page_title = page_info.get('page_title', 'Untitled')
@@ -418,7 +675,7 @@ class LvyaTechScraper:
 ---
 - **页面ID**: {page_info.get('page_id', '')}
 - **作者ID**: {page_info.get('author_uid', '')}
-- **创建时间**: {page_info.get('addtime', '')}
+- **创建时间**: {page_info.get('addtime', '') or page_info.get('page_addtime', '')}
 - **分类ID**: {page_info.get('cat_id', '')}
 ---
 
@@ -479,16 +736,32 @@ class LvyaTechScraper:
         
         print(f"Processing page: {page_title} (Item: {current_item_id}, Page: {page_id})")
         
-        # 获取页面内容
-        content = await self.get_page_content(current_item_id, page_id)
-        
-        # 根据格式确定文件扩展名
+        # 根据格式确定文件扩展名和获取方式
         if self.save_format == "mhtml":
             file_ext = ".mhtml"
+            # 获取页面内容（通过浏览器）
+            content = await self.get_page_content(current_item_id, page_id)
         elif self.save_format == "markdown":
             file_ext = ".md"
+            # 直接通过API获取Markdown内容
+            markdown_data = self.get_page_markdown(page_id)
+            if markdown_data:
+                # 使用API返回的更完整信息更新page_info
+                page_info.update(markdown_data)
+                content = (markdown_data.get('page_content', ''), b"")
+            else:
+                # 如果API失败，跳过该页面或尝试初始化浏览器
+                print(f"  Failed to get markdown via API")
+                if not self.browser:
+                    print(f"  Skipping page due to no browser initialized in Markdown mode")
+                    return
+                else:
+                    print(f"  Falling back to browser method")
+                    content = await self.get_page_content(current_item_id, page_id)
         else:
             file_ext = ".html"
+            # 获取页面内容（通过浏览器）
+            content = await self.get_page_content(current_item_id, page_id)
             
         file_name = f"{page_id}_{page_title_clean}{file_ext}"
         file_path = parent_path / file_name
@@ -499,7 +772,7 @@ class LvyaTechScraper:
         await self.save_page_content(page_info, content, file_path, page_url)
         
         # 延迟避免请求过快
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.5)  # 减少延迟，因为API调用更快
 
     async def process_catalog(self, catalog: Dict[str, Any], parent_path: Path, item_id: str = None):
         """递归处理目录和页面"""
@@ -574,11 +847,20 @@ class LvyaTechScraper:
         """爬取整个网站"""
         self.save_format = save_format
         print(f"Starting to scrape site with item_id: {self.item_id}")
-        print(f"Browser mode: {'Headless' if headless else 'Visible'}")
         print(f"Save format: {self.save_format}")
         
-        # 初始化浏览器
-        await self.init_browser(headless=headless)
+        # 如果是Markdown格式，可以选择不使用浏览器
+        if self.save_format == "markdown":
+            print("Using API mode for Markdown format (faster)")
+            # 仍然需要初始化session用于下载图片
+            self.session = aiohttp.ClientSession(
+                headers=self.headers,
+                cookies=self.cookies
+            )
+        else:
+            print(f"Browser mode: {'Headless' if headless else 'Visible'}")
+            # 初始化浏览器
+            await self.init_browser(headless=headless)
         
         try:
             # 获取网站结构
@@ -675,8 +957,14 @@ class LvyaTechScraper:
             print(f"Total pages processed: {len(self.processed_pages)}")
             
         finally:
-            # 关闭浏览器
-            await self.close_browser()
+            # 关闭资源
+            if self.save_format == "markdown":
+                # 关闭aiohttp session
+                if self.session:
+                    await self.session.close()
+            else:
+                # 关闭浏览器
+                await self.close_browser()
 
 
 async def main():
