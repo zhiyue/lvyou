@@ -1,0 +1,1146 @@
+{
+  "item_id": "39",
+  "item_domain": "",
+  "is_archived": "0",
+  "item_name": "《绿邮® X系列开发板》使用指南",
+  "default_page_id": "539",
+  "default_cat_id2": "0",
+  "default_cat_id3": 0,
+  "default_cat_id4": 0,
+  "unread_count": null,
+  "item_type": "1",
+  "menu": {
+    "pages": [
+      {
+        "page_id": "539",
+        "author_uid": "1",
+        "cat_id": "0",
+        "page_title": "简介",
+        "addtime": "1749043122",
+        "ext_info": ""
+      },
+      {
+        "page_id": "540",
+        "author_uid": "1",
+        "cat_id": "0",
+        "page_title": "版本变更",
+        "addtime": "1752500998",
+        "ext_info": ""
+      },
+      {
+        "page_id": "547",
+        "author_uid": "1",
+        "cat_id": "0",
+        "page_title": "进入设备管理后台",
+        "addtime": "1749043964",
+        "ext_info": ""
+      }
+    ],
+    "catalogs": [
+      {
+        "cat_id": "170",
+        "cat_name": "硬件安装",
+        "item_id": "39",
+        "s_number": "4",
+        "addtime": "1747273458",
+        "parent_cat_id": "0",
+        "level": "2",
+        "pages": [
+          {
+            "page_id": "541",
+            "author_uid": "1",
+            "cat_id": "170",
+            "page_title": "开发板硬件介绍",
+            "addtime": "1747300924",
+            "ext_info": ""
+          },
+          {
+            "page_id": "542",
+            "author_uid": "1",
+            "cat_id": "170",
+            "page_title": "电源头规格说明",
+            "addtime": "1747301633",
+            "ext_info": ""
+          }
+        ],
+        "catalogs": []
+      },
+      {
+        "cat_id": "171",
+        "cat_name": "快速入门",
+        "item_id": "39",
+        "s_number": "5",
+        "addtime": "1747301697",
+        "parent_cat_id": "0",
+        "level": "2",
+        "pages": [
+          {
+            "page_id": "543",
+            "author_uid": "1",
+            "cat_id": "171",
+            "page_title": "开发板连入WIFI",
+            "addtime": "1747301928",
+            "ext_info": ""
+          },
+          {
+            "page_id": "544",
+            "author_uid": "1",
+            "cat_id": "171",
+            "page_title": "获取开发板的ＩＰ地址",
+            "addtime": "1747302471",
+            "ext_info": ""
+          },
+          {
+            "page_id": "545",
+            "author_uid": "1",
+            "cat_id": "171",
+            "page_title": "配置开发板接口信息",
+            "addtime": "1747302697",
+            "ext_info": ""
+          },
+          {
+            "page_id": "546",
+            "author_uid": "1",
+            "cat_id": "171",
+            "page_title": "服务器端接收推送消息",
+            "addtime": "1747302752",
+            "ext_info": ""
+          }
+        ],
+        "catalogs": []
+      },
+      {
+        "cat_id": "197",
+        "cat_name": "接入第三方平台",
+        "item_id": "39",
+        "s_number": "6",
+        "addtime": "1748100743",
+        "parent_cat_id": "0",
+        "level": "2",
+        "pages": [
+          {
+            "page_id": "630",
+            "author_uid": "1",
+            "cat_id": "197",
+            "page_title": "接入Bark iOS",
+            "addtime": "1748685905",
+            "ext_info": ""
+          },
+          {
+            "page_id": "628",
+            "author_uid": "1",
+            "cat_id": "197",
+            "page_title": "接入企业微信群",
+            "addtime": "1749555873",
+            "ext_info": ""
+          },
+          {
+            "page_id": "631",
+            "author_uid": "1",
+            "cat_id": "197",
+            "page_title": "接入钉钉群",
+            "addtime": "1749198691",
+            "ext_info": ""
+          },
+          {
+            "page_id": "632",
+            "author_uid": "1",
+            "cat_id": "197",
+            "page_title": "接入飞书群",
+            "addtime": "1749198577",
+            "ext_info": ""
+          },
+          {
+            "page_id": "634",
+            "author_uid": "1",
+            "cat_id": "197",
+            "page_title": "接入Server酱3",
+            "addtime": "1749821269",
+            "ext_info": ""
+          },
+          {
+            "page_id": "633",
+            "author_uid": "1",
+            "cat_id": "197",
+            "page_title": "接入Server酱Turbo",
+            "addtime": "1749820717",
+            "ext_info": ""
+          },
+          {
+            "page_id": "629",
+            "author_uid": "1",
+            "cat_id": "197",
+            "page_title": "适配“绿微平台”普通WEB接口",
+            "addtime": "1748662023",
+            "ext_info": ""
+          }
+        ],
+        "catalogs": []
+      },
+      {
+        "cat_id": "173",
+        "cat_name": "设备管理后台",
+        "item_id": "39",
+        "s_number": "7",
+        "addtime": "1747302888",
+        "parent_cat_id": "0",
+        "level": "2",
+        "pages": [
+          {
+            "page_id": "548",
+            "author_uid": "1",
+            "cat_id": "173",
+            "page_title": "进入设备管理后台",
+            "addtime": "1747302904",
+            "ext_info": ""
+          }
+        ],
+        "catalogs": [
+          {
+            "cat_id": "174",
+            "cat_name": "（1）接口信息配置",
+            "item_id": "39",
+            "s_number": "2",
+            "addtime": "1747302952",
+            "parent_cat_id": "173",
+            "level": "3",
+            "pages": [
+              {
+                "page_id": "549",
+                "author_uid": "1",
+                "cat_id": "174",
+                "page_title": "功能概述",
+                "addtime": "1747303164",
+                "ext_info": ""
+              },
+              {
+                "page_id": "550",
+                "author_uid": "1",
+                "cat_id": "174",
+                "page_title": "接口地址设置",
+                "addtime": "1747303199",
+                "ext_info": ""
+              },
+              {
+                "page_id": "551",
+                "author_uid": "1",
+                "cat_id": "174",
+                "page_title": "HTTP接口设置",
+                "addtime": "1747303240",
+                "ext_info": ""
+              },
+              {
+                "page_id": "552",
+                "author_uid": "1",
+                "cat_id": "174",
+                "page_title": "TCP接口设置",
+                "addtime": "1747303478",
+                "ext_info": ""
+              },
+              {
+                "page_id": "553",
+                "author_uid": "1",
+                "cat_id": "174",
+                "page_title": "接口消息设置",
+                "addtime": "1747305541",
+                "ext_info": ""
+              },
+              {
+                "page_id": "554",
+                "author_uid": "1",
+                "cat_id": "174",
+                "page_title": "其它设置",
+                "addtime": "1747306319",
+                "ext_info": ""
+              }
+            ],
+            "catalogs": []
+          },
+          {
+            "cat_id": "175",
+            "cat_name": "（2）系统参数管理",
+            "item_id": "39",
+            "s_number": "3",
+            "addtime": "1747302965",
+            "parent_cat_id": "173",
+            "level": "3",
+            "pages": [
+              {
+                "page_id": "555",
+                "author_uid": "1",
+                "cat_id": "175",
+                "page_title": "功能概述",
+                "addtime": "1749993136",
+                "ext_info": ""
+              },
+              {
+                "page_id": "556",
+                "author_uid": "1",
+                "cat_id": "175",
+                "page_title": "隐含的系统参数",
+                "addtime": "1750430385",
+                "ext_info": ""
+              }
+            ],
+            "catalogs": []
+          },
+          {
+            "cat_id": "176",
+            "cat_name": "（3）用户参数管理",
+            "item_id": "39",
+            "s_number": "4",
+            "addtime": "1747302988",
+            "parent_cat_id": "173",
+            "level": "3",
+            "pages": [
+              {
+                "page_id": "557",
+                "author_uid": "1",
+                "cat_id": "176",
+                "page_title": "功能概述",
+                "addtime": "1747306510",
+                "ext_info": ""
+              },
+              {
+                "page_id": "558",
+                "author_uid": "1",
+                "cat_id": "176",
+                "page_title": "关于“参数引用”",
+                "addtime": "1750486910",
+                "ext_info": ""
+              },
+              {
+                "page_id": "559",
+                "author_uid": "1",
+                "cat_id": "176",
+                "page_title": "关于“适用消息ID”",
+                "addtime": "1747306572",
+                "ext_info": ""
+              }
+            ],
+            "catalogs": []
+          },
+          {
+            "cat_id": "177",
+            "cat_name": "（4）自定义接口消息",
+            "item_id": "39",
+            "s_number": "5",
+            "addtime": "1747302997",
+            "parent_cat_id": "173",
+            "level": "3",
+            "pages": [
+              {
+                "page_id": "560",
+                "author_uid": "1",
+                "cat_id": "177",
+                "page_title": "功能概述",
+                "addtime": "1747306612",
+                "ext_info": ""
+              }
+            ],
+            "catalogs": []
+          },
+          {
+            "cat_id": "178",
+            "cat_name": "（5）密码管理",
+            "item_id": "39",
+            "s_number": "6",
+            "addtime": "1747303007",
+            "parent_cat_id": "173",
+            "level": "3",
+            "pages": [
+              {
+                "page_id": "561",
+                "author_uid": "1",
+                "cat_id": "178",
+                "page_title": "功能概述",
+                "addtime": "1747306694",
+                "ext_info": ""
+              }
+            ],
+            "catalogs": []
+          },
+          {
+            "cat_id": "179",
+            "cat_name": "（6）附加函数",
+            "item_id": "39",
+            "s_number": "7",
+            "addtime": "1747303019",
+            "parent_cat_id": "173",
+            "level": "3",
+            "pages": [
+              {
+                "page_id": "562",
+                "author_uid": "1",
+                "cat_id": "179",
+                "page_title": "附加函数概述",
+                "addtime": "1750485903",
+                "ext_info": ""
+              },
+              {
+                "page_id": "563",
+                "author_uid": "1",
+                "cat_id": "179",
+                "page_title": "附加函数清单",
+                "addtime": "1752500852",
+                "ext_info": ""
+              }
+            ],
+            "catalogs": []
+          }
+        ]
+      },
+      {
+        "cat_id": "180",
+        "cat_name": "开发实践指南",
+        "item_id": "39",
+        "s_number": "8",
+        "addtime": "1747306853",
+        "parent_cat_id": "0",
+        "level": "2",
+        "pages": [
+          {
+            "page_id": "564",
+            "author_uid": "1",
+            "cat_id": "180",
+            "page_title": "关于接口类型",
+            "addtime": "1747306879",
+            "ext_info": ""
+          },
+          {
+            "page_id": "565",
+            "author_uid": "1",
+            "cat_id": "180",
+            "page_title": "开发板数据交互指南",
+            "addtime": "1747306908",
+            "ext_info": ""
+          },
+          {
+            "page_id": "566",
+            "author_uid": "1",
+            "cat_id": "180",
+            "page_title": "监测设备可用状态",
+            "addtime": "1747306932",
+            "ext_info": ""
+          }
+        ],
+        "catalogs": []
+      },
+      {
+        "cat_id": "181",
+        "cat_name": "控制命令",
+        "item_id": "39",
+        "s_number": "9",
+        "addtime": "1747307009",
+        "parent_cat_id": "0",
+        "level": "2",
+        "pages": [
+          {
+            "page_id": "568",
+            "author_uid": "1",
+            "cat_id": "181",
+            "page_title": "什么是控制命令",
+            "addtime": "1747307350",
+            "ext_info": ""
+          },
+          {
+            "page_id": "569",
+            "author_uid": "1",
+            "cat_id": "181",
+            "page_title": "安全模型与token机制",
+            "addtime": "1747307369",
+            "ext_info": ""
+          }
+        ],
+        "catalogs": [
+          {
+            "cat_id": "182",
+            "cat_name": "设备控制类命令",
+            "item_id": "39",
+            "s_number": "3",
+            "addtime": "1747307457",
+            "parent_cat_id": "181",
+            "level": "3",
+            "pages": [
+              {
+                "page_id": "570",
+                "author_uid": "1",
+                "cat_id": "182",
+                "page_title": "chpwduser - 修改用户密码",
+                "addtime": "1747307680",
+                "ext_info": ""
+              },
+              {
+                "page_id": "571",
+                "author_uid": "1",
+                "cat_id": "182",
+                "page_title": "now - 设置开发板时间",
+                "addtime": "1747307665",
+                "ext_info": ""
+              },
+              {
+                "page_id": "572",
+                "author_uid": "1",
+                "cat_id": "182",
+                "page_title": "stat - 获取开发板状态",
+                "addtime": "1747308581",
+                "ext_info": ""
+              },
+              {
+                "page_id": "573",
+                "author_uid": "1",
+                "cat_id": "182",
+                "page_title": "restart - 重启开发板",
+                "addtime": "1747308589",
+                "ext_info": ""
+              },
+              {
+                "page_id": "574",
+                "author_uid": "1",
+                "cat_id": "182",
+                "page_title": "pingsec - 修改ping间隔秒数",
+                "addtime": "1747308598",
+                "ext_info": ""
+              },
+              {
+                "page_id": "575",
+                "author_uid": "1",
+                "cat_id": "182",
+                "page_title": "dailyrst - 设置每日重启时间",
+                "addtime": "1747308607",
+                "ext_info": ""
+              }
+            ],
+            "catalogs": []
+          },
+          {
+            "cat_id": "183",
+            "cat_name": "卡槽控制命令",
+            "item_id": "39",
+            "s_number": "4",
+            "addtime": "1747308177",
+            "parent_cat_id": "181",
+            "level": "3",
+            "pages": [
+              {
+                "page_id": "576",
+                "author_uid": "1",
+                "cat_id": "183",
+                "page_title": "slotoff - 指定卡槽关机",
+                "addtime": "1747308538",
+                "ext_info": ""
+              },
+              {
+                "page_id": "577",
+                "author_uid": "1",
+                "cat_id": "183",
+                "page_title": "slotrst - 指定卡槽重启",
+                "addtime": "1747308556",
+                "ext_info": ""
+              },
+              {
+                "page_id": "637",
+                "author_uid": "1",
+                "cat_id": "183",
+                "page_title": "slotplmn - 指定卡注册的运营商",
+                "addtime": "1751463564",
+                "ext_info": ""
+              }
+            ],
+            "catalogs": []
+          },
+          {
+            "cat_id": "184",
+            "cat_name": "WiFi控制命令",
+            "item_id": "39",
+            "s_number": "5",
+            "addtime": "1747308266",
+            "parent_cat_id": "181",
+            "level": "3",
+            "pages": [
+              {
+                "page_id": "578",
+                "author_uid": "1",
+                "cat_id": "184",
+                "page_title": "wf - 打开或关闭wifi",
+                "addtime": "1747308510",
+                "ext_info": ""
+              },
+              {
+                "page_id": "579",
+                "author_uid": "1",
+                "cat_id": "184",
+                "page_title": "addwf - 增加wifi热点信息",
+                "addtime": "1747308519",
+                "ext_info": ""
+              },
+              {
+                "page_id": "580",
+                "author_uid": "1",
+                "cat_id": "184",
+                "page_title": "delwf - 删除wifi热点信息",
+                "addtime": "1747308528",
+                "ext_info": ""
+              }
+            ],
+            "catalogs": []
+          },
+          {
+            "cat_id": "185",
+            "cat_name": "短信命令",
+            "item_id": "39",
+            "s_number": "6",
+            "addtime": "1747308417",
+            "parent_cat_id": "181",
+            "level": "3",
+            "pages": [
+              {
+                "page_id": "581",
+                "author_uid": "1",
+                "cat_id": "185",
+                "page_title": "sendsms - 外发短信",
+                "addtime": "1747308500",
+                "ext_info": ""
+              },
+              {
+                "page_id": "635",
+                "author_uid": "1",
+                "cat_id": "185",
+                "page_title": "querysms - 查询本地短信库",
+                "addtime": "1751461844",
+                "ext_info": ""
+              }
+            ],
+            "catalogs": []
+          },
+          {
+            "cat_id": "186",
+            "cat_name": "通话命令",
+            "item_id": "39",
+            "s_number": "7",
+            "addtime": "1747315260",
+            "parent_cat_id": "181",
+            "level": "3",
+            "pages": [
+              {
+                "page_id": "582",
+                "author_uid": "1",
+                "cat_id": "186",
+                "page_title": "通话指令概述",
+                "addtime": "1747315336",
+                "ext_info": ""
+              },
+              {
+                "page_id": "583",
+                "author_uid": "1",
+                "cat_id": "186",
+                "page_title": "teldial - 电话拨号",
+                "addtime": "1747315390",
+                "ext_info": ""
+              },
+              {
+                "page_id": "584",
+                "author_uid": "1",
+                "cat_id": "186",
+                "page_title": "telanswer - 接听来电",
+                "addtime": "1747315434",
+                "ext_info": ""
+              },
+              {
+                "page_id": "585",
+                "author_uid": "1",
+                "cat_id": "186",
+                "page_title": "telhangup - 电话挂机",
+                "addtime": "1747315473",
+                "ext_info": ""
+              },
+              {
+                "page_id": "586",
+                "author_uid": "1",
+                "cat_id": "186",
+                "page_title": "telstarttts - 播放TTS语音",
+                "addtime": "1752738079",
+                "ext_info": ""
+              },
+              {
+                "page_id": "587",
+                "author_uid": "1",
+                "cat_id": "186",
+                "page_title": "telstoptts- 停止播放TTS语音",
+                "addtime": "1751643257",
+                "ext_info": ""
+              },
+              {
+                "page_id": "638",
+                "author_uid": "1",
+                "cat_id": "186",
+                "page_title": "telkeypress - 本地电话按键",
+                "addtime": "1753337805",
+                "ext_info": ""
+              },
+              {
+                "page_id": "636",
+                "author_uid": "1",
+                "cat_id": "186",
+                "page_title": "querytel - 查询本地通话记录",
+                "addtime": "1751461652",
+                "ext_info": ""
+              }
+            ],
+            "catalogs": []
+          },
+          {
+            "cat_id": "187",
+            "cat_name": "OTA升级命令",
+            "item_id": "39",
+            "s_number": "8",
+            "addtime": "1747315576",
+            "parent_cat_id": "181",
+            "level": "3",
+            "pages": [
+              {
+                "page_id": "588",
+                "author_uid": "1",
+                "cat_id": "187",
+                "page_title": "dailyota - 设置每日OTA升级时间",
+                "addtime": "1747315608",
+                "ext_info": ""
+              },
+              {
+                "page_id": "589",
+                "author_uid": "1",
+                "cat_id": "187",
+                "page_title": "otanow- 立即执行OTA升级",
+                "addtime": "1747315671",
+                "ext_info": ""
+              }
+            ],
+            "catalogs": []
+          }
+        ]
+      },
+      {
+        "cat_id": "188",
+        "cat_name": "推送消息",
+        "item_id": "39",
+        "s_number": "10",
+        "addtime": "1747315723",
+        "parent_cat_id": "0",
+        "level": "2",
+        "pages": [
+          {
+            "page_id": "590",
+            "author_uid": "1",
+            "cat_id": "188",
+            "page_title": "什么是推送消息",
+            "addtime": "1747315772",
+            "ext_info": ""
+          },
+          {
+            "page_id": "591",
+            "author_uid": "1",
+            "cat_id": "188",
+            "page_title": "消息推送的顺序",
+            "addtime": "1747315795",
+            "ext_info": ""
+          }
+        ],
+        "catalogs": [
+          {
+            "cat_id": "189",
+            "cat_name": "设备状态消息",
+            "item_id": "39",
+            "s_number": "3",
+            "addtime": "1747315839",
+            "parent_cat_id": "188",
+            "level": "3",
+            "pages": [
+              {
+                "page_id": "592",
+                "author_uid": "1",
+                "cat_id": "189",
+                "page_title": "100 - WIFI已联网",
+                "addtime": "1751470329",
+                "ext_info": ""
+              },
+              {
+                "page_id": "593",
+                "author_uid": "1",
+                "cat_id": "189",
+                "page_title": "101 - SIM1已联网",
+                "addtime": "1750507598",
+                "ext_info": ""
+              },
+              {
+                "page_id": "594",
+                "author_uid": "1",
+                "cat_id": "189",
+                "page_title": "102 - SIM2已联网",
+                "addtime": "1750507666",
+                "ext_info": ""
+              },
+              {
+                "page_id": "595",
+                "author_uid": "1",
+                "cat_id": "189",
+                "page_title": "202 - SIM卡基站注册",
+                "addtime": "1747315985",
+                "ext_info": ""
+              },
+              {
+                "page_id": "596",
+                "author_uid": "1",
+                "cat_id": "189",
+                "page_title": "203 - SIM卡IMSI上报",
+                "addtime": "1747316014",
+                "ext_info": ""
+              },
+              {
+                "page_id": "597",
+                "author_uid": "1",
+                "cat_id": "189",
+                "page_title": "204 - SIM卡已就绪",
+                "addtime": "1747316032",
+                "ext_info": ""
+              },
+              {
+                "page_id": "598",
+                "author_uid": "1",
+                "cat_id": "189",
+                "page_title": "205 - SIM卡已弹出",
+                "addtime": "1747316080",
+                "ext_info": ""
+              },
+              {
+                "page_id": "599",
+                "author_uid": "1",
+                "cat_id": "189",
+                "page_title": "209 - SIM卡错误",
+                "addtime": "1747316100",
+                "ext_info": ""
+              },
+              {
+                "page_id": "600",
+                "author_uid": "1",
+                "cat_id": "189",
+                "page_title": "301 - 通信模组异常",
+                "addtime": "1747316128",
+                "ext_info": ""
+              }
+            ],
+            "catalogs": []
+          },
+          {
+            "cat_id": "190",
+            "cat_name": "短信消息",
+            "item_id": "39",
+            "s_number": "4",
+            "addtime": "1747316146",
+            "parent_cat_id": "188",
+            "level": "3",
+            "pages": [
+              {
+                "page_id": "601",
+                "author_uid": "1",
+                "cat_id": "190",
+                "page_title": "501 - 新短信消息",
+                "addtime": "1749993331",
+                "ext_info": ""
+              },
+              {
+                "page_id": "602",
+                "author_uid": "1",
+                "cat_id": "190",
+                "page_title": "502 - 外发短信成功消息",
+                "addtime": "1747316312",
+                "ext_info": ""
+              }
+            ],
+            "catalogs": []
+          },
+          {
+            "cat_id": "191",
+            "cat_name": "通话消息",
+            "item_id": "39",
+            "s_number": "5",
+            "addtime": "1747316203",
+            "parent_cat_id": "188",
+            "level": "3",
+            "pages": [
+              {
+                "page_id": "603",
+                "author_uid": "1",
+                "cat_id": "191",
+                "page_title": "601 - 来电振铃消息",
+                "addtime": "1747316328",
+                "ext_info": ""
+              },
+              {
+                "page_id": "604",
+                "author_uid": "1",
+                "cat_id": "191",
+                "page_title": "602 - 来电接通消息",
+                "addtime": "1747316353",
+                "ext_info": ""
+              },
+              {
+                "page_id": "605",
+                "author_uid": "1",
+                "cat_id": "191",
+                "page_title": "603 - 来电挂断消息",
+                "addtime": "1747316457",
+                "ext_info": ""
+              },
+              {
+                "page_id": "606",
+                "author_uid": "1",
+                "cat_id": "191",
+                "page_title": "620 - 去电拨号消息",
+                "addtime": "1747316417",
+                "ext_info": ""
+              },
+              {
+                "page_id": "607",
+                "author_uid": "1",
+                "cat_id": "191",
+                "page_title": "621 - 去电振铃消息",
+                "addtime": "1747316447",
+                "ext_info": ""
+              },
+              {
+                "page_id": "608",
+                "author_uid": "1",
+                "cat_id": "191",
+                "page_title": "622 - 去电接通报告",
+                "addtime": "1747316485",
+                "ext_info": ""
+              },
+              {
+                "page_id": "609",
+                "author_uid": "1",
+                "cat_id": "191",
+                "page_title": "623 - 去电挂断报告",
+                "addtime": "1747316519",
+                "ext_info": ""
+              },
+              {
+                "page_id": "610",
+                "author_uid": "1",
+                "cat_id": "191",
+                "page_title": "641 - 通话本地按键",
+                "addtime": "1747316818",
+                "ext_info": ""
+              },
+              {
+                "page_id": "611",
+                "author_uid": "1",
+                "cat_id": "191",
+                "page_title": "642 - 通话远程按键",
+                "addtime": "1747316770",
+                "ext_info": ""
+              }
+            ],
+            "catalogs": []
+          },
+          {
+            "cat_id": "192",
+            "cat_name": "其它消息",
+            "item_id": "39",
+            "s_number": "6",
+            "addtime": "1747316840",
+            "parent_cat_id": "188",
+            "level": "3",
+            "pages": [
+              {
+                "page_id": "612",
+                "author_uid": "1",
+                "cat_id": "192",
+                "page_title": "998 - 设备PING消息",
+                "addtime": "1747316885",
+                "ext_info": ""
+              }
+            ],
+            "catalogs": []
+          }
+        ]
+      },
+      {
+        "cat_id": "193",
+        "cat_name": "短信指令",
+        "item_id": "39",
+        "s_number": "11",
+        "addtime": "1747316919",
+        "parent_cat_id": "0",
+        "level": "2",
+        "pages": [
+          {
+            "page_id": "613",
+            "author_uid": "1",
+            "cat_id": "193",
+            "page_title": "什么是短信指令",
+            "addtime": "1747316940",
+            "ext_info": ""
+          }
+        ],
+        "catalogs": [
+          {
+            "cat_id": "194",
+            "cat_name": "用户短信指令",
+            "item_id": "39",
+            "s_number": "2",
+            "addtime": "1747316957",
+            "parent_cat_id": "193",
+            "level": "3",
+            "pages": [
+              {
+                "page_id": "614",
+                "author_uid": "1",
+                "cat_id": "194",
+                "page_title": "pwd - 修改用户密码",
+                "addtime": "1747316979",
+                "ext_info": ""
+              },
+              {
+                "page_id": "615",
+                "author_uid": "1",
+                "cat_id": "194",
+                "page_title": "stat - 查询开发板当前状态",
+                "addtime": "1747316997",
+                "ext_info": ""
+              },
+              {
+                "page_id": "616",
+                "author_uid": "1",
+                "cat_id": "194",
+                "page_title": "wf - 打开关闭wifi及查询状态",
+                "addtime": "1747317014",
+                "ext_info": ""
+              },
+              {
+                "page_id": "617",
+                "author_uid": "1",
+                "cat_id": "194",
+                "page_title": "addwf - 增加wifi热点信息",
+                "addtime": "1747317040",
+                "ext_info": ""
+              },
+              {
+                "page_id": "618",
+                "author_uid": "1",
+                "cat_id": "194",
+                "page_title": "restart - 控制开发板重启",
+                "addtime": "1747317078",
+                "ext_info": ""
+              }
+            ],
+            "catalogs": []
+          },
+          {
+            "cat_id": "195",
+            "cat_name": "管理短信指令",
+            "item_id": "39",
+            "s_number": "3",
+            "addtime": "1747317094",
+            "parent_cat_id": "193",
+            "level": "3",
+            "pages": [
+              {
+                "page_id": "619",
+                "author_uid": "1",
+                "cat_id": "195",
+                "page_title": "pm99inf - 变更接口地址",
+                "addtime": "1747317148",
+                "ext_info": ""
+              },
+              {
+                "page_id": "620",
+                "author_uid": "1",
+                "cat_id": "195",
+                "page_title": "pm99msgid - 变更上报消息",
+                "addtime": "1747317214",
+                "ext_info": ""
+              },
+              {
+                "page_id": "621",
+                "author_uid": "1",
+                "cat_id": "195",
+                "page_title": "pm99aes - 变更加密设置",
+                "addtime": "1747317257",
+                "ext_info": ""
+              },
+              {
+                "page_id": "622",
+                "author_uid": "1",
+                "cat_id": "195",
+                "page_title": "pm99admpwd - 变更管理密码",
+                "addtime": "1747317355",
+                "ext_info": ""
+              },
+              {
+                "page_id": "623",
+                "author_uid": "1",
+                "cat_id": "195",
+                "page_title": "pm99usrpwd - 变更用户密码",
+                "addtime": "1747317383",
+                "ext_info": ""
+              },
+              {
+                "page_id": "624",
+                "author_uid": "1",
+                "cat_id": "195",
+                "page_title": "pm99rst - 重启开发板",
+                "addtime": "1747317410",
+                "ext_info": ""
+              }
+            ],
+            "catalogs": []
+          }
+        ]
+      },
+      {
+        "cat_id": "196",
+        "cat_name": "常见问题",
+        "item_id": "39",
+        "s_number": "12",
+        "addtime": "1747317439",
+        "parent_cat_id": "0",
+        "level": "2",
+        "pages": [
+          {
+            "page_id": "625",
+            "author_uid": "1",
+            "cat_id": "196",
+            "page_title": "相关配件的采购",
+            "addtime": "1747317489",
+            "ext_info": ""
+          },
+          {
+            "page_id": "626",
+            "author_uid": "1",
+            "cat_id": "196",
+            "page_title": "如何将开发板重置回出厂设置",
+            "addtime": "1750490688",
+            "ext_info": ""
+          },
+          {
+            "page_id": "627",
+            "author_uid": "1",
+            "cat_id": "196",
+            "page_title": "通过短信不能获取WIFI的IP地址",
+            "addtime": "1747317527",
+            "ext_info": ""
+          }
+        ],
+        "catalogs": []
+      }
+    ]
+  },
+  "is_login": false,
+  "item_edit": false,
+  "item_manage": false,
+  "ItemPermn": false,
+  "ItemCreator": false,
+  "current_page_id": "",
+  "global_param": [],
+  "show_watermark": null
+}
